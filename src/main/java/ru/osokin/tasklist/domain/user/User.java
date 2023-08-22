@@ -21,10 +21,11 @@ public class User {
     private String username;
     @Column(name = "password")
     private String password;
-    private String passwordConfirmation;
+
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "users_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
+    @Column(name = "role")
     private Set<Role> roles;
 }

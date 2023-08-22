@@ -17,8 +17,6 @@ import ru.osokin.tasklist.web.dto.validation.OnUpdate;
 public class UserController {
 
     private final UserService userService;
-
-
     private final UserMapper userMapper;
 
 

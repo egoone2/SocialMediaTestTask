@@ -22,9 +22,11 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public JwtResponse login(JwtRequest loginRequest) {
         JwtResponse jwtResponse = new JwtResponse();
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
                                                         loginRequest.getPassword()));
+
         User user = userService.getByUsername(loginRequest.getUsername());
         jwtResponse.setId(user.getId());
         jwtResponse.setUsername(user.getUsername());

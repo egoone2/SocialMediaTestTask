@@ -33,6 +33,9 @@ public class AuthController {
 
     @PostMapping("/register")
     public UserDto register(@Validated(OnCreate.class) @RequestBody UserDto userDto) {
+        if (!userDto.getPassword().equals(userDto.getPasswordConfirmation()))
+            throw new IllegalStateException("Password and password confirmation do not match.");
+
         User user = userMapper.toEntity(userDto);
         User createdUser = userService.create(user);
         return userMapper.toDto(createdUser);

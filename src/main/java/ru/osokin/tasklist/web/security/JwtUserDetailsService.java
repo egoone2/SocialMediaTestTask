@@ -19,4 +19,5 @@ public class JwtUserDetailsService implements UserDetailsService {
         User user = userService.getByUsername(username);
         return JwtEntityFactory.create(user);
     }
+
 }
