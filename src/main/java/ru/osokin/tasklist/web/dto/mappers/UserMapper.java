@@ -5,9 +5,36 @@ import ru.osokin.tasklist.domain.user.User;
 import ru.osokin.tasklist.web.dto.user.UserDto;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper {
+public class UserMapper {
 
-    UserDto toDto(User user);
+    public UserDto toDto(User user) {
+        if ( user == null ) {
+            return null;
+        }
 
-    User toEntity(UserDto dto);
+        UserDto userDto = new UserDto();
+
+        userDto.setId( user.getId() );
+        userDto.setEmail( user.getEmail() );
+        userDto.setUsername( user.getUsername() );
+        userDto.setPassword( user.getPassword() );
+
+        return userDto;
+    }
+
+    public User toEntity(UserDto dto) {
+        if ( dto == null ) {
+            return null;
+        }
+
+        User user = new User();
+
+        user.setId( dto.getId() );
+        user.setEmail( dto.getEmail() );
+        user.setUsername( dto.getUsername() );
+        user.setPassword( dto.getPassword() );
+
+        return user;
+    }
+
 }

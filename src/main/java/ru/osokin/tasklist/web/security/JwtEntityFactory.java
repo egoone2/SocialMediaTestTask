@@ -10,7 +10,7 @@ public class JwtEntityFactory {
         return new JwtEntity(
                 user.getId(),
                 user.getUsername(),
-                user.getName(),
+                user.getEmail(),
                 user.getPassword(),
                 new ArrayList<>(user.getRoles())
         );

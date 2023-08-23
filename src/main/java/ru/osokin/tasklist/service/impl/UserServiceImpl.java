@@ -10,6 +10,8 @@ import ru.osokin.tasklist.domain.user.User;
 import ru.osokin.tasklist.repository.UserRepository;
 import ru.osokin.tasklist.service.UserService;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -28,6 +30,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getByUsername(String username) {
+
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User with this username not found."));
     }
@@ -38,6 +41,12 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return user;
+    }
+
+    @Override
+    @Transactional
+    public void updateSubs(List<User> users) {
+        userRepository.saveAll(users);
     }
 
     @Override
@@ -60,5 +69,6 @@ public class UserServiceImpl implements UserService {
 
         userRepository.deleteById(id);
     }
+
 
 }

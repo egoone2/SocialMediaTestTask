@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.osokin.tasklist.domain.exception.FileStorageException;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +24,7 @@ public class FileStorageService {
     private String uploadPath;
 
 
-    public String storeFile(MultipartFile file) throws IOException {
+    public String storeFile(MultipartFile file) {
         if (!file.isEmpty()) {
             File uploadDir = new File(uploadPath);
 
@@ -34,7 +35,12 @@ public class FileStorageService {
             String resultFileName = uuidFile + "." + file.getOriginalFilename();
 
 
-            file.transferTo(new File(uploadPath + "/" + resultFileName));
+            try {
+                file.transferTo(new File(uploadPath + "/" + resultFileName));
+            } catch (IOException e) {
+                throw new FileStorageException("Cannot store file!");
+            }
+
             return resultFileName;
         }
         return "";

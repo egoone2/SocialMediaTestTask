@@ -29,23 +29,11 @@ CREATE TABLE Post
 
 alter table Post add column when_posted timestamp
 
--- create table if not exists tasks
--- (
---     id              bigserial primary key,
---     title           varchar(255) not null,
---     description     varchar(255) null,
---     status          varchar(255) not null,
---     expiration_date timestamp    null
--- );
---
--- CREATE TABLE if NOT EXISTS Users_task
--- (
---     user_id bigint not null,
---     task_id bigint not null,
---     primary key(user_id, task_id),
---     CONSTRAINT fk_user_task_user FOREIGN key (user_id) references users(id) on delete cascade on update no action,
---         CONSTRAINT fk_user_task_task FOREIGN key (task_id) references tasks(id) on delete cascade on update no action
--- );
-
-
-
+create table if not exists user_subscriptions
+(
+    channel_id    bigint not null,
+    subscriber_id bigint not null,
+    foreign key (channel_id) references users (id),
+    foreign key (subscriber_id) references users (id),
+    primary key (channel_id, subscriber_id)
+);
