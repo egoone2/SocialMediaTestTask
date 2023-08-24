@@ -27,8 +27,8 @@ public class PostController {
     private final ObjectMapper objectMapper;
 
     @PostMapping("/add")
-    public PostAddedResponse addPost(@RequestParam("file") MultipartFile file,
-                                     @RequestParam("post") String postJson) throws JsonProcessingException {
+    public PostAddedResponse addPost(@RequestPart("file") MultipartFile file,
+                                     @RequestPart("post") String postJson) throws JsonProcessingException {
 
         PostDto postDto = objectMapper.readValue(postJson, PostDto.class);
         String filename = fileStorageService.storeFile(file);
@@ -89,7 +89,7 @@ public class PostController {
 
     @ExceptionHandler
     public ResponseEntity<?> handleException(AccessDeniedException e) {
-        return new ResponseEntity<>("Access denied.", HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>("Access denied. You can not edit or delete other's posts.", HttpStatus.FORBIDDEN);
     }
 
 

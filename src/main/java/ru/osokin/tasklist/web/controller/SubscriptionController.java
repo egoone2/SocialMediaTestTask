@@ -1,13 +1,13 @@
 package ru.osokin.tasklist.web.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.osokin.tasklist.domain.exception.ResourceNotFoundException;
+import ru.osokin.tasklist.domain.exception.SubscriptionException;
 import ru.osokin.tasklist.domain.user.User;
 import ru.osokin.tasklist.service.SubscriptionService;
 import ru.osokin.tasklist.service.UserService;
@@ -22,18 +22,33 @@ public class SubscriptionController {
 
     @PatchMapping("/{id}/subscribe")
     public ResponseEntity<?> subscribe(@PathVariable("id") Long userToSubscribeId) {
-        // TODO: проверка на наличие подписки
+        User currentUser = getCurrentUser();
+        if (subscriptionService.checkIfSubscribed(currentUser, userToSubscribeId))
+            throw new SubscriptionException("You have already subscribed on this person");
 
-        subscriptionService.subscribe(getCurrentUser(), userToSubscribeId);
+        subscriptionService.subscribe(currentUser, userToSubscribeId);
         return ResponseEntity.ok("Successful subscribe");
     }
 
     @PatchMapping("/{id}/unsubscribe")
     public ResponseEntity<?> unsubscribe(@PathVariable("id") Long userToUnsubscribeId) {
-        // TODO: проверка на наличие подписки
+        User currentUser = getCurrentUser();
+        if (!subscriptionService.checkIfSubscribed(currentUser, userToUnsubscribeId))
+            throw new SubscriptionException("You are not subscribed on this person");
 
-        subscriptionService.unsubscribe(getCurrentUser(), userToUnsubscribeId);
+
+        subscriptionService.unsubscribe(currentUser, userToUnsubscribeId);
         return ResponseEntity.ok("Successful unsubscribe");
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<?> handleException(ResourceNotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<?> handleException(SubscriptionException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     private User getCurrentUser() {

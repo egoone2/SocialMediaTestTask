@@ -8,5 +8,6 @@ public interface SubscriptionService {
 
     void unsubscribe(User currentUser, Long userToUnsubscribeId);
 
+    boolean checkIfSubscribed(User currentUser, Long userToCheckId);
 
 }

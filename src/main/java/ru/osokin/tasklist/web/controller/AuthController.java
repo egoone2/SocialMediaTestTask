@@ -1,11 +1,10 @@
 package ru.osokin.tasklist.web.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.osokin.tasklist.domain.user.User;
 import ru.osokin.tasklist.service.AuthService;
 import ru.osokin.tasklist.service.UserService;
@@ -39,6 +38,11 @@ public class AuthController {
         User user = userMapper.toEntity(userDto);
         User createdUser = userService.create(user);
         return userMapper.toDto(createdUser);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<?> handleException(IllegalStateException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/refresh")

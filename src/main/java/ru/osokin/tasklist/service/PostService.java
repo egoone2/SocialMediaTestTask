@@ -17,5 +17,9 @@ public interface PostService {
 
     void update(Post post);
 
-    List<Post> getAllSubscriptionsPosts(User user);
+    List<Post> getAllSubscriptionsPosts(int pageNo, int pageSize, String sortDir);
+
+
+
+
 }

@@ -27,7 +27,7 @@ CREATE TABLE Post
     constraint fk_post_user foreign key (author_id) references Users (id) on delete cascade on update no action
 );
 
-alter table Post add column when_posted timestamp
+alter table Post add column when_posted timestamp;
 
 create table if not exists user_subscriptions
 (

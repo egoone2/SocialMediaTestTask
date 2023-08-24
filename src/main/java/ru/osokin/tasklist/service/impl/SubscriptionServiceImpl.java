@@ -22,8 +22,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     @Transactional
     public void subscribe(User currentUser, Long userToSubscribeId) {
-        User userToSubscribe = userRepository.findById(userToSubscribeId).orElseThrow(() ->
-                new ResourceNotFoundException("User you are trying to subscribe does not exist."));
+        User userToSubscribe = getUserToCheckOrSubscribeById(userToSubscribeId);
         userToSubscribe.getSubscribers().add(currentUser);
         currentUser.getSubscriptions().add(userToSubscribe);
 
@@ -33,12 +32,23 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     @Transactional
     public void unsubscribe(User currentUser, Long userToUnsubscribeId) {
-        User userToUnsubscribe = userRepository.findById(userToUnsubscribeId).orElseThrow(() ->
-                new ResourceNotFoundException("User you are trying to unsubscribe does not exist."));
+        User userToUnsubscribe = getUserToCheckOrSubscribeById(userToUnsubscribeId);
 
         userToUnsubscribe.getSubscribers().remove(currentUser);
         currentUser.getSubscriptions().remove(userToUnsubscribe);
 
         userRepository.saveAll(List.of(userToUnsubscribe, currentUser));
+    }
+
+    @Override
+    public boolean checkIfSubscribed(User currentUser, Long userToCheckId) {
+        User userToCheck = getUserToCheckOrSubscribeById(userToCheckId);
+
+        return currentUser.getSubscriptions().contains(userToCheck);
+    }
+
+    private User getUserToCheckOrSubscribeById(Long id) {
+        return userRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("User you are trying to unsubscribe does not exist."));
     }
 }
