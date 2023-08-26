@@ -1,8 +1,6 @@
 package ru.osokin.tasklist.service.impl;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +8,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 import ru.osokin.tasklist.config.AppConstants;
 import ru.osokin.tasklist.domain.Post;
 import ru.osokin.tasklist.domain.exception.ResourceNotFoundException;
@@ -18,12 +15,13 @@ import ru.osokin.tasklist.domain.user.User;
 import ru.osokin.tasklist.repository.PostRepository;
 import ru.osokin.tasklist.service.PostService;
 import ru.osokin.tasklist.service.UserService;
-import ru.osokin.tasklist.web.dto.validation.OnUpdate;
+import ru.osokin.tasklist.web.dto.mappers.PostConverter;
+import ru.osokin.tasklist.web.dto.post.PostDto;
 import ru.osokin.tasklist.web.security.JwtEntity;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,21 +30,25 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final UserService userService;
+    private final PostConverter postConverter;
 
 
     @Override
-    public List<Post> getAllPostsById(Long id) {
-        return postRepository.findPostsByAuthorId(id);
+    public List<PostDto> getAllPostsById(Long id) {
+        return postRepository.findPostsByAuthorId(id).stream()
+                .map(postConverter::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public Post getById(Long id) {
+
         return postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post not found"));
     }
 
     @Override
     @Transactional
-    public Post create(String header, String content, String filename) {
+    public PostDto create(String header, String content, String filename) {
         JwtEntity userDetails = (JwtEntity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Post post = new Post();
         post.setHeader(header);
@@ -55,7 +57,7 @@ public class PostServiceImpl implements PostService {
         post.setAuthor(userService.getByUsername(userDetails.getUsername()));
         post.setFilename(filename);
         postRepository.save(post);
-        return post;
+        return postConverter.toDto(post);
     }
 
     @Override
@@ -69,13 +71,18 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public void update(Post post) {
-        postRepository.save(post);
+    public void update(Post postToUpdate, PostDto postDto) {
+        if (!postDto.getFileName().isEmpty())
+            postToUpdate.setFilename(postDto.getFileName());
+
+        postToUpdate.setHeader(postDto.getHeader());
+        postToUpdate.setContent(postDto.getContent());
+        postRepository.save(postToUpdate);
     }
 
 
     @Override
-    public List<Post> getAllSubscriptionsPosts(int pageNo, int pageSize, String sortDir) {
+    public List<PostDto> getAllSubscriptionsPosts(int pageNo, int pageSize, String sortDir) {
         User currentUser = getCurrentUser();
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(AppConstants.DEFAULT_POSTS_SORT_PROPERTY).ascending()
@@ -85,7 +92,9 @@ public class PostServiceImpl implements PostService {
         Page<Post> posts = postRepository.findAllSubscriptionsPosts(currentUser.getId(), pageable);
 
 
-        return posts.getContent();
+        return posts.getContent().stream()
+                .map(postConverter::toDto)
+                .collect(Collectors.toList());
     }
 
     private User getCurrentUser() {

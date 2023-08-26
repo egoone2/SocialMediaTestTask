@@ -61,7 +61,7 @@ public class ApplicationConfig {
                 .exceptionHandling()
                 .authenticationEntryPoint(((request, response, authException) -> {
                     response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                    response.getWriter().write("Unauthorized.");
+                    response.getWriter().write("Unauthorized."); // TODO
                 }))
                 .accessDeniedHandler((request, response, accessDeniedException) -> {
                     response.setStatus(HttpStatus.FORBIDDEN.value());

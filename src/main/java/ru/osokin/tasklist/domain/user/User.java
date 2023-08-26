@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import ru.osokin.tasklist.domain.Post;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,11 +33,14 @@ public class User {
     @Column(name = "role")
     private Set<Role> roles;
 
+    @OneToMany(mappedBy = "author")
+    private Set<Post> posts;
+
     @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "user_subscriptions",
-            joinColumns = {@JoinColumn(name = "channel_id")},
+            joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "subscriber_id")}
     )
     Set<User> subscribers = new HashSet<>();                            // Список подписчиков

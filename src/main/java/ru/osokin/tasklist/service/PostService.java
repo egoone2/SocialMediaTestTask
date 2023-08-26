@@ -1,23 +1,23 @@
 package ru.osokin.tasklist.service;
 
 import ru.osokin.tasklist.domain.Post;
-import ru.osokin.tasklist.domain.user.User;
+import ru.osokin.tasklist.web.dto.post.PostDto;
 
 import java.util.List;
 
 public interface PostService {
 
-    List<Post> getAllPostsById(Long id);
+    List<PostDto> getAllPostsById(Long id);
 
     Post getById(Long id);
 
-    Post create(String header, String content, String filename);
+    PostDto create(String header, String content, String filename);
 
     void delete(Long id);
 
-    void update(Post post);
+    void update(Post post, PostDto postDto);
 
-    List<Post> getAllSubscriptionsPosts(int pageNo, int pageSize, String sortDir);
+    List<PostDto> getAllSubscriptionsPosts(int pageNo, int pageSize, String sortDir);
 
 
 

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "Ответ после добавления поста")
-public class PostAddedResponse {
+public class PostAddedResponse extends SuccessResponse{
 
     private String header;
     private String content;

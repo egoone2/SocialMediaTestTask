@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.osokin.tasklist.domain.exception.ResourceNotFoundException;
+import ru.osokin.tasklist.domain.exception.SubscriptionException;
 import ru.osokin.tasklist.domain.user.User;
 import ru.osokin.tasklist.repository.UserRepository;
 import ru.osokin.tasklist.service.SubscriptionService;
@@ -22,7 +23,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     @Transactional
     public void subscribe(User currentUser, Long userToSubscribeId) {
-        User userToSubscribe = getUserToCheckOrSubscribeById(userToSubscribeId);
+        User userToSubscribe = getUserToCheckOrSubscribe(userToSubscribeId);
+        if (checkIfSubscribed(currentUser, userToSubscribeId)) {
+            throw new SubscriptionException("You have already subscribed on this person");
+        }
         userToSubscribe.getSubscribers().add(currentUser);
         currentUser.getSubscriptions().add(userToSubscribe);
 
@@ -32,7 +36,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     @Transactional
     public void unsubscribe(User currentUser, Long userToUnsubscribeId) {
-        User userToUnsubscribe = getUserToCheckOrSubscribeById(userToUnsubscribeId);
+        User userToUnsubscribe = getUserToCheckOrSubscribe(userToUnsubscribeId);
+
+        if (!checkIfSubscribed(currentUser, userToUnsubscribeId)) {
+            throw new SubscriptionException("You are not subscribed on this person");
+        }
 
         userToUnsubscribe.getSubscribers().remove(currentUser);
         currentUser.getSubscriptions().remove(userToUnsubscribe);
@@ -42,12 +50,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public boolean checkIfSubscribed(User currentUser, Long userToCheckId) {
-        User userToCheck = getUserToCheckOrSubscribeById(userToCheckId);
+        User userToCheck = getUserToCheckOrSubscribe(userToCheckId);
 
         return currentUser.getSubscriptions().contains(userToCheck);
     }
 
-    private User getUserToCheckOrSubscribeById(Long id) {
+    private User getUserToCheckOrSubscribe(Long id) {
         return userRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("User you are trying to unsubscribe does not exist."));
     }

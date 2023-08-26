@@ -1,9 +1,8 @@
-CREATE SCHEMA IF NOT EXISTS tasklist;
 
 create table if not exists users
 (
     id       bigserial primary key,
-    name     varchar(255) not null,
+    email     varchar(255) not null,
     username varchar(255) not null unique,
     password varchar(255) not null
 );
@@ -24,16 +23,15 @@ CREATE TABLE Post
     text_content varchar(255),
     filename     varchar(255),
     author_id    bigint not null,
+    when_posted timestamp,
     constraint fk_post_user foreign key (author_id) references Users (id) on delete cascade on update no action
 );
 
-alter table Post add column when_posted timestamp;
-
 create table if not exists user_subscriptions
 (
-    channel_id    bigint not null,
+    user_id    bigint not null,
     subscriber_id bigint not null,
-    foreign key (channel_id) references users (id),
+    foreign key (user_id) references users (id),
     foreign key (subscriber_id) references users (id),
-    primary key (channel_id, subscriber_id)
+    primary key (user_id, subscriber_id)
 );

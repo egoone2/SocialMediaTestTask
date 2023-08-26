@@ -31,9 +31,5 @@ public class UserDto {
     @Schema(description = "Пароль")
     private String password;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @NotNull(message = "Confirmation must not be null", groups = {OnCreate.class})
-    @Schema(description = "Подтверждение пароля")
-    private String passwordConfirmation;
 
 }
