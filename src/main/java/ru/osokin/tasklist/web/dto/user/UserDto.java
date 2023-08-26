@@ -1,6 +1,7 @@
 package ru.osokin.tasklist.web.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
@@ -11,6 +12,7 @@ import ru.osokin.tasklist.web.dto.validation.OnUpdate;
 
 @Data
 @NoArgsConstructor
+@Schema(description = "Сущность пользователя")
 public class UserDto {
     @NotNull(message = "Id must be not null", groups = {OnUpdate.class})
     private Long id;
@@ -26,10 +28,12 @@ public class UserDto {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull(message = "Password must not be null", groups = {OnCreate.class, OnUpdate.class})
+    @Schema(description = "Пароль")
     private String password;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull(message = "Confirmation must not be null", groups = {OnCreate.class})
+    @Schema(description = "Подтверждение пароля")
     private String passwordConfirmation;
 
 }

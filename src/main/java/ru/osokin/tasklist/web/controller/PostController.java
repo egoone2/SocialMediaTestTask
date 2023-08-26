@@ -2,6 +2,10 @@ package ru.osokin.tasklist.web.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +24,8 @@ import ru.osokin.tasklist.web.security.JwtEntity;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/posts")
+@Tag(name = "Посты (публикации)")
+
 public class PostController {
 
     private final PostService postService;
@@ -27,8 +33,10 @@ public class PostController {
     private final ObjectMapper objectMapper;
 
     @PostMapping("/add")
-    public PostAddedResponse addPost(@RequestPart("file") MultipartFile file,
-                                     @RequestPart("post") String postJson) throws JsonProcessingException {
+    @Operation(summary = "Добавление публикации", description = "Позволяет добваить пост")
+    @SecurityRequirement(name = "JWT")
+    public PostAddedResponse addPost(@RequestPart("file") @Parameter(description = "Файл для загрузки (до 200 МБ)") MultipartFile file,
+                                     @RequestPart("post") @Parameter(description = "Сущность PostDto в формате Json") String postJson) throws JsonProcessingException {
 
         PostDto postDto = objectMapper.readValue(postJson, PostDto.class);
         String filename = fileStorageService.storeFile(file);
@@ -49,14 +57,17 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public Post publication(@PathVariable("id") Long id) {
+    @Operation(summary = "Публикация")
+    public Post publication(@PathVariable("id") @Parameter(description = "Идентификатор публикации") Long id) {
         return postService.getById(id);
     }
 
     @PatchMapping("/{id}")
-    public Post editPost(@PathVariable("id") Long id,
-                         @RequestPart("post") String postJson,
-                         @RequestPart("file") MultipartFile file) throws JsonProcessingException {
+    @Operation(summary = "Изменение публикации", description = "Позволяет изменить пост")
+    @SecurityRequirement(name = "JWT")
+    public Post editPost(@PathVariable("id") @Parameter(description = "Идентификатор публикации") Long id,
+                         @RequestPart("post") @Parameter(description = "Сущность PostDto в формате Json") String postJson,
+                         @RequestPart("file") @Parameter(description = "Файл для загрузки (до 200 МБ)") MultipartFile file) throws JsonProcessingException {
         Post postToUpdate = checkIfCurrentUser(id);
 
         PostDto postDto = objectMapper.readValue(postJson, PostDto.class);
@@ -72,7 +83,8 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deletePost(@PathVariable("id") Long id) {
+    @SecurityRequirement(name = "JWT")
+    public ResponseEntity<HttpStatus> deletePost(@PathVariable("id") @Parameter(description = "Идентификатор публикации") Long id) {
         checkIfCurrentUser(id);
 
         postService.delete(id);

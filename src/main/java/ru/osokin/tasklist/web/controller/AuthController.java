@@ -1,5 +1,6 @@
 package ru.osokin.tasklist.web.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import ru.osokin.tasklist.web.dto.validation.OnCreate;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "Аутентификация", description = "Контроллер для JWT аутентификации")
 public class AuthController {
 
     private final AuthService authService;

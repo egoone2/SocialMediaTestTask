@@ -1,5 +1,9 @@
 package ru.osokin.tasklist.web.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +19,17 @@ import ru.osokin.tasklist.service.UserService;
 @RestController
 @RequestMapping("/api/v1/subs")
 @RequiredArgsConstructor
+@Tag(name = "Подписки", description = "Подписка и отписка")
+@SecurityRequirement(name = "JWT")
 public class SubscriptionController {
 
     private final UserService userService;
     private final SubscriptionService subscriptionService;
 
     @PatchMapping("/{id}/subscribe")
-    public ResponseEntity<?> subscribe(@PathVariable("id") Long userToSubscribeId) {
+    @Operation(summary = "Подписаться", description = "Позволяет подписаться на выбранного пользователя")
+    public ResponseEntity<?> subscribe(@PathVariable("id")
+                                       @Parameter(description = "Идентификатор пользователя, на которого нужно подписаться") Long userToSubscribeId) {
         User currentUser = getCurrentUser();
         if (subscriptionService.checkIfSubscribed(currentUser, userToSubscribeId))
             throw new SubscriptionException("You have already subscribed on this person");
@@ -31,7 +39,9 @@ public class SubscriptionController {
     }
 
     @PatchMapping("/{id}/unsubscribe")
-    public ResponseEntity<?> unsubscribe(@PathVariable("id") Long userToUnsubscribeId) {
+    @Operation(summary = "Отписаться", description = "Позволяет отписаться от выбранного пользователя")
+    public ResponseEntity<?> unsubscribe(@PathVariable("id")
+                                         @Parameter(description = "Идентификатор пользователя, от которого нужно отписаться") Long userToUnsubscribeId) {
         User currentUser = getCurrentUser();
         if (!subscriptionService.checkIfSubscribed(currentUser, userToUnsubscribeId))
             throw new SubscriptionException("You are not subscribed on this person");
