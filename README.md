@@ -1,7 +1,8 @@
 # SocialMediaTestTask
 Разработка бэкэнда для платформы социальной сети с возможностью создания профиля, загрузки публикаций, а так же подписки на других пользователей.
 Технологии:
-Spring Security
+<p></p>
+Spring Security</p>
 Java
 Spring Data Jpa
 PostgreSQL
